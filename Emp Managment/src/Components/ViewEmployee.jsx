@@ -123,7 +123,7 @@ const ViewEmployee = () => {
 
 
       // when scroll reaches bottom
-      if (scrollHeight - scrollTop - clientHeight < 50) {
+      if (scrollHeight - scrollTop - clientHeight < 1) {
         if (hasMoreRef.current) {
           console.log(scrollTop, scrollHeight, clientHeight)
           setPage((prev) => prev + 1);
@@ -193,7 +193,7 @@ const ViewEmployee = () => {
             </div>
 
             {/* Department Filter */}
-            <div className="flex items-center border border-gray-300 rounded-lg px-2 py-1 w-[240px] hover:shadow-sm transition-all">
+            <div className=" h-9.5  flex items-center border border-gray-300 rounded-lg px-2 py-1 w-[240px] hover:shadow-sm transition-all">
               <select
                 className="outline-none flex-grow text-gray-700 text-sm px-2"
                 value={filters.department}
@@ -210,7 +210,7 @@ const ViewEmployee = () => {
             </div>
 
             {/* Status Filter */}
-            <div className="flex items-center border border-gray-300 rounded-lg px-2 py-1 w-[240px] hover:shadow-sm transition-all">
+            <div className="h-9.5  flex items-center border border-gray-300 rounded-lg px-2 py-1 w-[240px] hover:shadow-sm transition-all">
               <select
                 className="outline-none flex-grow text-gray-700 text-sm px-2 bg-white"
                 value={filters.status}

@@ -3,3 +3,26 @@
 body{
   background: rgb(219, 219, 219);
 }
+
+.custom-scrollbar {
+  scrollbar-gutter: stable both-edges; /* keeps scrollbar inside the box */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}

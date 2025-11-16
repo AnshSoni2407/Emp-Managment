@@ -25,7 +25,7 @@ const Header = () => {
           onClick={() => navigate("/manage")}
           className="bg-yellow-600 p-1 text-white px-2 hover:bg-yellow-800 transition-all duration-300 rounded-2xl text-xl flex gap-3 items-center cursor-pointer"
         >
-          Manage Employee <FaTools />
+          Manage <FaTools />
         </button>
 
         {/* View Employee */}
@@ -33,7 +33,7 @@ const Header = () => {
           onClick={() => navigate("/view")} // you can change /1 to a dynamic id when you integrate backend
           className="bg-blue-600 p-1 text-white px-2 hover:bg-blue-950 transition-all duration-300 rounded-2xl text-xl flex gap-3 items-center cursor-pointer"
         >
-          View Employee <FaEye />
+          View <FaEye />
         </button>
 
         {/* Add Employee */}
@@ -41,7 +41,7 @@ const Header = () => {
           onClick={() => navigate("/add")}
           className="bg-green-700 p-1 text-white px-2 rounded-2xl text-xl flex gap-3 items-center cursor-pointer hover:bg-green-950 transition-all duration-300"
         >
-          Add Employee <IoMdAddCircle />
+          Add <IoMdAddCircle />
         </button>
 
         <button

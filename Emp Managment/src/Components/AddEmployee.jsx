@@ -27,14 +27,14 @@ const AddEmployee = () => {
     },
   });
 
-  // 🔹 Prefill form if editing
-  useEffect(() => {
+  // 🔹  Prefill form if editing
+   useEffect(() => {
     if (existingEmployee) {
       Object.keys(existingEmployee).forEach((key) =>
         setValue(key, existingEmployee[key])
       );
     }
-  }, [existingEmployee, setValue]);
+  }, [existingEmployee]);
 
   // 🔹 Handle submit (add or update)
   const onSubmit = async (data) => {

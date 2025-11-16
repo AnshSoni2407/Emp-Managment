@@ -7,14 +7,12 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gray-100">
       <Header />
 
-      {/* 🔹 Background Image Section */}
       <div
         className="mt-4 h-[90vh] w-full bg-cover bg-center rounded-lg shadow-lg"
         style={{
           backgroundImage: `url(${dashBG})`,
         }}
       >
-        {/* Optional overlay text (remove if not needed) */}
         <div className="flex flex-col items-center justify-center h-[30vh] backdrop:blur-3xl bg-black/50  hover:bg-black/80  transition-all duration-500 bg-opacity-40 text-white">
           <h1 className="text-4xl font-bold mb-2">
             Welcome to Employee Dashboard

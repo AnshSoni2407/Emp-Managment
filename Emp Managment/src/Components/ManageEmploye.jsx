@@ -1,13 +1,14 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "./Header";
 import { FaFilter } from "react-icons/fa";
 import { TbArrowsSort } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 
-const ManageEmployee = () => {
+import InfiniteScroll from "react-infinite-scroll-component";
 
-  const navigate = useNavigate()
+const ManageEmployee = () => {
+  const navigate = useNavigate();
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [page, setPage] = useState(1);
@@ -27,40 +28,44 @@ const ManageEmployee = () => {
     department: "",
     status: "",
   });
+  const [isLoading, setisLoading] = useState(false);
 
-  
   // Fetch all employees
- useEffect(() => {
+  useEffect(() => {
     fetchEmployees();
   }, [page]);
 
   const fetchEmployees = async () => {
+    if (isLoading) return;
+    setisLoading(true);
+
     try {
       const res = await axios.get(
         `http://localhost:8081/employees?page=${page}&limit=10`
       );
       const newData = res.data;
 
-      if (newData.length === 0) {
+      if (newData.length < 9) {
         setHasMore(false);
       } else {
         // prevent duplicate data
         setEmployees((prev) => {
-          const ids = new Set(prev.map((e) => e.id || e._id));
-          const unique = newData.filter((e) => !ids.has(e.id || e._id));
+          const ids = new Set(prev.map((e) => e.id));
+          const unique = newData.filter((e) => !ids.has(e.id));
           return [...prev, ...unique];
         });
         setFilteredEmployees((prev) => {
-          const ids = new Set(prev.map((e) => e.id || e._id));
-          const unique = newData.filter((e) => !ids.has(e.id || e._id));
+          const ids = new Set(prev.map((e) => e.id));
+          const unique = newData.filter((e) => !ids.has(e.id));
           return [...prev, ...unique];
         });
       }
     } catch (error) {
       console.error("Error fetching employees:", error);
+    } finally {
+      setisLoading(false);
     }
   };
-
 
   //  Filter Function
   const handleFilter = () => {
@@ -81,7 +86,7 @@ const ManageEmployee = () => {
         : true;
 
       return matchesName && matchesSalary && matchesDept && matchesStatus;
-      });
+    });
     setFilteredEmployees(filtered);
   };
 
@@ -116,7 +121,7 @@ const ManageEmployee = () => {
 
   const openDeleteModal = (name, id) => {
     setdeleteModal(true);
-    setselectedForDelete({name, id});
+    setselectedForDelete({ name, id });
     console.log(selectedForDelete);
   };
 
@@ -126,6 +131,9 @@ const ManageEmployee = () => {
       await axios.delete(`http://localhost:8081/employees/${id}`);
 
       fetchEmployees();
+      setFilteredEmployees((prev) => prev.filter((e) => e.id !== id));
+      setEmployees((prev) => prev.filter((e) => e.id !== id));
+
       setdeleteModal(false);
     } catch (error) {
       console.error(error);
@@ -134,41 +142,22 @@ const ManageEmployee = () => {
 
   //  Edit Employee
   const handleEdit = (emp) => {
-    
-navigate("/add", { state: { employee: emp } });
-
+    navigate("/add", { state: { employee: emp } });
   };
 
-    // ✅ Infinite scroll
-    useEffect(() => {
-      const handleScroll = () => {
-        if (
-          window.innerHeight + window.scrollY >=
-          document.documentElement.scrollHeight - 100
-        ) {
-          console.log('FETCH APPLIED')
-          if (hasMore) setPage((prev) => prev + 1);
-        }
-      };
-  
-      window.addEventListener("scroll", handleScroll);
-      return () => window.removeEventListener("scroll", handleScroll);
-    }, [hasMore]);
-  
-  
-
+  // ✅ Infinite scroll
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <div className="max-w-6xl mx-auto py-8 px-4">
+      <div className="max-w-full m-auto py-8 px-4">
         <h2 className="relative text-3xl font-bold text-gray-800 mb-6 text-center border-b pb-3">
           All Employees
           <button
             onClick={() => setIsFilterActive((prev) => !prev)}
-            className="absolute right-0 top-0 bg-yellow-600 p-1 text-white px-3 rounded-2xl text-lg flex gap-2 items-center cursor-pointer hover:bg-yellow-800 transition-all duration-300"
+            className="absolute right-0 top-0 bg-yellow-600 p-2 text-white   rounded-xl  text-lg flex gap-2 items-center cursor-pointer hover:bg-yellow-800 transition-all duration-300"
           >
-            Filter <FaFilter />
+             <FaFilter />
           </button>
         </h2>
 
@@ -215,7 +204,7 @@ navigate("/add", { state: { employee: emp } });
             </div>
 
             {/*  Department Search */}
-            <div className="flex items-center border border-gray-300 rounded-lg px-2 py-1 w-[240px] hover:shadow-sm transition-all">
+            <div className="h-9.5 flex items-center border border-gray-300 rounded-lg px-2 py-1 w-[240px] hover:shadow-sm transition-all">
               <select
                 placeholder="Department: IT / HR"
                 className="outline-none flex-grow text-gray-700 text-sm px-2"
@@ -246,7 +235,7 @@ navigate("/add", { state: { employee: emp } });
             </div>
 
             {/*  Status Search */}
-            <div className="flex items-center border border-gray-300 rounded-lg px-2 py-1 w-[240px] hover:shadow-sm transition-all">
+            <div className="h-9.5 flex items-center border border-gray-300 rounded-lg px-2 py-1 w-[240px] hover:shadow-sm transition-all">
               <select
                 className="outline-none flex-grow text-gray-700 text-sm px-2 bg-white"
                 value={filters.status}
@@ -274,68 +263,75 @@ navigate("/add", { state: { employee: emp } });
             No employees found.
           </p>
         ) : (
-          <div className="bg-white rounded-2xl shadow-lg mt-4 h-[65vh] overflow-y-auto">
-            <table className="min-w-full text-left border-collapse">
-              <thead className="sticky top-0 bg-gray-200 text-gray-700 uppercase text-sm">
-                <tr>
-                  <th className="py-3 px-4">Name</th>
-                  <th className="py-3 px-4">Email</th>
-                  <th className="py-3 px-4">Department</th>
-                  <th className="py-3 px-4">Designation</th>
-                  <th className="py-3 px-4">Salary</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-center">Actions</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {filteredEmployees.map((emp) => (
-                  <tr
-                    key={emp.id}
-                    className="border-t hover:bg-gray-50 transition-all"
-                  >
-                    <td className="py-3 px-4 font-medium">{emp.name}</td>
-                    <td className="py-3 px-4">{emp.email}</td>
-                    <td className="py-3 px-4">{emp.department}</td>
-                    <td className="py-3 px-4">{emp.designation}</td>
-                    <td className="py-3 px-4">₹{emp.salary}</td>
-                    <td className="py-3 px-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          emp.status === "Active"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {emp.status}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-center space-x-2">
-                      <button
-                        onClick={() => handleEdit(emp)}
-                        className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => openDeleteModal(emp.name, emp.id)}
-                        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                      >
-                        Delete
-                      </button>
-                    </td>
+          <InfiniteScroll
+            dataLength={employees.length}
+            next={() => setPage((prev) => prev + 1)}
+            hasMore={hasMore}
+            loader={<></>}
+            endMessage={
+              <p className="text-center text-gray-500 py-2">No more Data..</p>
+            }
+            scrollableTarget="scrollableDiv"
+            className="w-[90%] m-auto shadow-xl  "
+          >
+            <div
+              id="scrollableDiv"
+              className="custom-scrollbar bg-white rounded-2xl  mt-4 h-[65vh] min-w-full mx-auto  overflow-auto  p-0"
+            >
+              <table className=" w-full text-center border-collapse">
+                <thead className="sticky top-0 bg-gray-200 text-gray-700  uppercase text-sm">
+                  <tr>
+                    <th className="py-3 px-4">Name</th>
+                    <th className="py-3 px-4">Email</th>
+                    <th className="py-3 px-4">Department</th>
+                    <th className="py-3 px-4">Designation</th>
+                    <th className="py-3 px-4">Salary</th>
+                    <th className="py-3 px-4">Status</th>
+                    <th className="py-3 px-4 text-center">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            {hasMore ? (
-              <p className="text-center text-gray-500 py-4">Loading more...</p>
-            ) : (
-              <p className="text-center text-gray-500 py-4">
-                No more employees
-              </p>
-            )}
-          </div>
+                </thead>
+                <tbody>
+                  {filteredEmployees.map((emp) => (
+                    <tr
+                      key={emp.id}
+                      className="border-t hover:bg-gray-50 transition-all"
+                    >
+                      <td className="py-3 px-4 font-medium">{emp.name}</td>
+                      <td className="py-3 px-4">{emp.email}</td>
+                      <td className="py-3 px-4">{emp.department}</td>
+                      <td className="py-3 px-4">{emp.designation}</td>
+                      <td className="py-3 px-4">₹{emp.salary}</td>
+                      <td className="py-3 px-4">
+                        <span
+                          className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            emp.status === "Active"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {emp.status}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center space-x-2">
+                        <button
+                          onClick={() => handleEdit(emp)}
+                          className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => openDeleteModal(emp.name, emp.id)}
+                          className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </InfiniteScroll>
         )}
 
         {/*  Delete Modal */}
