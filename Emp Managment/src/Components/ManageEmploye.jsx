@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 
 import InfiniteScroll from "react-infinite-scroll-component";
 
+const VITE_API_URL = import.meta.env.VITE_API_URL;
+
 const ManageEmployee = () => {
   const navigate = useNavigate();
   const [employees, setEmployees] = useState([]);
@@ -41,7 +43,7 @@ const ManageEmployee = () => {
 
     try {
       const res = await axios.get(
-        `http://localhost:8081/employees?page=${page}&limit=10`
+        `${VITE_API_URL}/employees?page=${page}&limit=10`,
       );
       const newData = res.data;
 
@@ -112,7 +114,7 @@ const ManageEmployee = () => {
   const handleSortBySalary = () => {
     const newOrder = sortOrder.salary === "asc" ? "desc" : "asc";
     const sorted = [...filteredEmployees].sort((a, b) =>
-      newOrder === "asc" ? a.salary - b.salary : b.salary - a.salary
+      newOrder === "asc" ? a.salary - b.salary : b.salary - a.salary,
     );
     setFilteredEmployees(sorted);
     setSortOrder({ ...sortOrder, salary: newOrder });
@@ -128,7 +130,7 @@ const ManageEmployee = () => {
   //  Delete Employee
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8081/employees/${id}`);
+      await axios.delete(`${VITE_API_URL}/employees/${id}`);
 
       fetchEmployees();
       setFilteredEmployees((prev) => prev.filter((e) => e.id !== id));
@@ -157,7 +159,7 @@ const ManageEmployee = () => {
             onClick={() => setIsFilterActive((prev) => !prev)}
             className="absolute right-0 top-0 bg-yellow-600 p-2 text-white   rounded-xl  text-lg flex gap-2 items-center cursor-pointer hover:bg-yellow-800 transition-all duration-300"
           >
-             <FaFilter />
+            <FaFilter />
           </button>
         </h2>
 

@@ -1,17 +1,18 @@
 import mysql from "mysql2";
 
 const db = mysql.createConnection({
-  host: "127.0.0.1",
-  user: "root",
-  password: "Respect+1", 
-  database: "employee_management",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
 });
 
 db.connect((err) => {
   if (err) {
-    console.log(" DB Connection Failed:", err);
+    console.log("❌ DB Connection Failed:", err.message);
   } else {
-    console.log(" MySQL DB Connected Successfully!");
+    console.log("✅ MySQL DB Connected Successfully!");
   }
 });
 

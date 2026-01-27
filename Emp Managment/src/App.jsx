@@ -1,5 +1,6 @@
 import React from "react";
 import "./App.css";
+import dotenv from 'dotenv'
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import AddEmployee from "./Components/AddEmployee.jsx";
 import ViewEmployee from "./Components/ViewEmployee.jsx";

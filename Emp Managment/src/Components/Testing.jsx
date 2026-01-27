@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 const Testing = () => {
   const [employees, setemployees] = useState([]);
   const [page, setpage] = useState(1);
@@ -11,7 +12,7 @@ const Testing = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8081/employees?page=${page}&limit=5`
+          `${VITE_API_URL}/employees?page=${page}&limit=5`,
         );
 
         if (res.data.length == 0){

@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import Header from "./Header";
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const AddEmployee = () => {
   const navigate = useNavigate();
@@ -28,10 +29,10 @@ const AddEmployee = () => {
   });
 
   // 🔹  Prefill form if editing
-   useEffect(() => {
+  useEffect(() => {
     if (existingEmployee) {
       Object.keys(existingEmployee).forEach((key) =>
-        setValue(key, existingEmployee[key])
+        setValue(key, existingEmployee[key]),
       );
     }
   }, [existingEmployee]);
@@ -41,12 +42,12 @@ const AddEmployee = () => {
     try {
       if (existingEmployee) {
         await axios.put(
-          `http://localhost:8081/employees/${existingEmployee.id}`,
-          data
+          `${VITE_API_URL}/${existingEmployee.id}`,
+          data,
         );
         alert("✅ Employee Updated Successfully!");
       } else {
-        await axios.post("http://localhost:8081/employees", data);
+        await axios.post(`${VITE_API_URL}/employees`, data);
         alert("✅ Employee Added Successfully!");
       }
       navigate("/view");

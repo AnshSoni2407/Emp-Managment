@@ -4,6 +4,7 @@ import Header from "./Header";
 import { FaFilter } from "react-icons/fa";
 import { TbArrowsSort } from "react-icons/tb";
 
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 const ViewEmployee = () => {
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
@@ -26,7 +27,7 @@ const ViewEmployee = () => {
   const fetchEmployees = async (pageNum) => {
     try {
       const res = await axios.get(
-        `http://localhost:8081/employees?page=${pageNum}&limit=10`
+        `${VITE_API_URL}/employees?page=${pageNum}&limit=10`,
       );
 
       // handle response properly
@@ -98,14 +99,13 @@ const ViewEmployee = () => {
   const handleSortBySalary = () => {
     const newOrder = sortOrder.salary === "asc" ? "desc" : "asc";
     const sorted = [...filteredEmployees].sort((a, b) =>
-      newOrder === "asc" ? a.salary - b.salary : b.salary - a.salary
+      newOrder === "asc" ? a.salary - b.salary : b.salary - a.salary,
     );
     setFilteredEmployees(sorted);
     setSortOrder({ ...sortOrder, salary: newOrder });
   };
 
-
-  // Infinite scroll 
+  // Infinite scroll
   const wrapperRef = useRef(null);
   const hasMoreRef = useRef(hasMore);
 
@@ -121,11 +121,10 @@ const ViewEmployee = () => {
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = wrapper;
 
-
       // when scroll reaches bottom
       if (scrollHeight - scrollTop - clientHeight < 1) {
         if (hasMoreRef.current) {
-          console.log(scrollTop, scrollHeight, clientHeight)
+          console.log(scrollTop, scrollHeight, clientHeight);
           setPage((prev) => prev + 1);
         }
       }
