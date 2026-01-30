@@ -31,7 +31,7 @@ const ViewEmployee = () => {
       );
 
       // handle response properly
-      const newData = Array.isArray(res.data) ? res.data : res.data.data;
+      const newData = res.data.employees;
 
       if (!newData || newData.length === 0) {
         setHasMore(false);
@@ -41,11 +41,7 @@ const ViewEmployee = () => {
           const unique = newData.filter((e) => !ids.has(e.id || e._id));
           return [...prev, ...unique];
         });
-        setFilteredEmployees((prev) => {
-          const ids = new Set(prev.map((e) => e.id || e._id));
-          const unique = newData.filter((e) => !ids.has(e.id || e._id));
-          return [...prev, ...unique];
-        });
+       
       }
     } catch (error) {
       console.error("Error fetching employees:", error);
@@ -54,32 +50,34 @@ const ViewEmployee = () => {
 
   // ✅ Fetch whenever page changes
   useEffect(() => {
-    console.log("Fetching page:", page);
     fetchEmployees(page);
   }, [page]);
 
   //  Handle filters
-  useEffect(() => {
-    const filtered = employees.filter((emp) => {
-      return (
-        (filters.name
-          ? emp.name?.toLowerCase().includes(filters.name.toLowerCase())
-          : true) &&
-        (filters.salary
-          ? emp.salary?.toString().includes(filters.salary)
-          : true) &&
-        (filters.department
-          ? emp.department
-              ?.toLowerCase()
-              .includes(filters.department.toLowerCase())
-          : true) &&
-        (filters.status
-          ? emp.status?.toLowerCase().includes(filters.status.toLowerCase())
-          : true)
-      );
-    });
-    setFilteredEmployees(filtered);
-  }, [filters, employees]);
+useEffect(() => {
+  const filtered = employees.filter((emp) => {
+    return (
+      (filters.name
+        ? emp.name?.toLowerCase().includes(filters.name.toLowerCase())
+        : true) &&
+      (filters.salary
+        ? emp.salary?.toString().includes(filters.salary)
+        : true) &&
+      (filters.department
+        ? emp.department
+            ?.toLowerCase()
+            .includes(filters.department.toLowerCase())
+        : true) &&
+      (filters.status
+        ? emp.status?.trim().toLowerCase() ===
+          filters.status.trim().toLowerCase()
+        : true)
+    );
+  });
+
+  setFilteredEmployees(filtered);
+}, [filters, employees]);
+
 
   // Sorting by Name
   const handleSortByName = () => {
@@ -124,7 +122,6 @@ const ViewEmployee = () => {
       // when scroll reaches bottom
       if (scrollHeight - scrollTop - clientHeight < 1) {
         if (hasMoreRef.current) {
-          console.log(scrollTop, scrollHeight, clientHeight);
           setPage((prev) => prev + 1);
         }
       }
@@ -142,9 +139,9 @@ const ViewEmployee = () => {
           All Employees
           <button
             onClick={() => setIsFilterActive((prev) => !prev)}
-            className="absolute right-0 top-0 bg-yellow-600 p-1 text-white px-3 rounded-2xl text-lg flex gap-2 items-center cursor-pointer hover:bg-yellow-800 transition-all duration-300"
+            className="absolute right-0 top-0 bg-yellow-600 p-2 text-white   rounded-xl  text-lg flex gap-2 items-center cursor-pointer hover:bg-yellow-800 transition-all duration-300"
           >
-            Filter <FaFilter />
+            <span className=" hidden md:block">Filters</span> <FaFilter />
           </button>
         </h2>
 
@@ -235,15 +232,15 @@ const ViewEmployee = () => {
             ref={wrapperRef}
             className="employee-table-wrapper bg-white rounded-2xl shadow-lg mt-4 h-[65vh] overflow-y-auto"
           >
-            <table className="min-w-full text-left border-collapse">
-              <thead className="sticky top-0 bg-gray-200 text-gray-700 uppercase text-sm">
+            <table className="min-w-full text-left border-collapse text-sm md:text-base">
+              <thead className="sticky top-0 bg-gray-200 text-gray-700 uppercase">
                 <tr>
-                  <th className="py-3 px-4">Name</th>
-                  <th className="py-3 px-4">Email</th>
-                  <th className="py-3 px-4">Department</th>
-                  <th className="py-3 px-4">Designation</th>
-                  <th className="py-3 px-4">Salary</th>
-                  <th className="py-3 px-4">Status</th>
+                  <th className="px-2 py-2 md:px-4 md:py-3">Name</th>
+                  <th className="px-2 py-2 md:px-4 md:py-3">Email</th>
+                  <th className="px-2 py-2 md:px-4 md:py-3">Department</th>
+                  <th className="px-2 py-2 md:px-4 md:py-3">Designation</th>
+                  <th className="px-2 py-2 md:px-4 md:py-3">Salary</th>
+                  <th className="px-2 py-2 md:px-4 md:py-3">Status</th>
                 </tr>
               </thead>
 
@@ -253,14 +250,20 @@ const ViewEmployee = () => {
                     key={emp.id || emp._id}
                     className="border-t hover:bg-gray-50 transition-all"
                   >
-                    <td className="p-5 py-9 px-4 font-medium">{emp.name}</td>
-                    <td className="p-5 py-9 px-4">{emp.email}</td>
-                    <td className="p-5 py-9 px-4">{emp.department}</td>
-                    <td className="p-5 py-9 px-4">{emp.designation}</td>
-                    <td className="p-5 py-9 px-4">₹{emp.salary}</td>
-                    <td className="p-5 py-9 px-4">
+                    <td className="px-2 py-2 md:px-4 md:py-3 font-medium">
+                      {emp.name}
+                    </td>
+                    <td className="px-2 py-2 md:px-4 md:py-3">{emp.email}</td>
+                    <td className="px-2 py-2 md:px-4 md:py-3">
+                      {emp.department}
+                    </td>
+                    <td className="px-2 py-2 md:px-4 md:py-3">
+                      {emp.designation}
+                    </td>
+                    <td className="px-2 py-2 md:px-4 md:py-3">₹{emp.salary}</td>
+                    <td className="px-2 py-2 md:px-4 md:py-3">
                       <span
-                        className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        className={`px-2 py-0.5 md:px-3 md:py-1 rounded-full text-xs md:text-sm font-medium ${
                           emp.status?.toLowerCase() === "active"
                             ? "bg-green-100 text-green-700"
                             : "bg-red-100 text-red-700"

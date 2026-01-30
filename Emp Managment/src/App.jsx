@@ -1,6 +1,5 @@
 import React from "react";
 import "./App.css";
-import dotenv from 'dotenv'
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import AddEmployee from "./Components/AddEmployee.jsx";
 import ViewEmployee from "./Components/ViewEmployee.jsx";
@@ -9,20 +8,26 @@ import ManageEmployee from "./Components/ManageEmploye.jsx";
 import NotFound from "./Components/NotFound.jsx";
 import Testing from "./Components/Testing.jsx";
 
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/testing" element={<Testing />} />
+    <>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/testing" element={<Testing />} />
+          <Route path="/add" element={<AddEmployee />} />
+          <Route path="/manage" element={<ManageEmployee />} />
+          <Route path="/view" element={<ViewEmployee />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
 
-        <Route path="/add" element={<AddEmployee />} />
-        <Route path="/manage" element={<ManageEmployee />} />
-        <Route path="/view" element={<ViewEmployee />} />
-        {/*  route to prevent ynwanted path */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+      {/* Toast lives once globally */}
+      <ToastContainer position="top-right" autoClose={2000} />
+    </>
   );
 }
 

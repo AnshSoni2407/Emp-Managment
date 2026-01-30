@@ -3,6 +3,8 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import Header from "./Header";
+import { toast } from "react-toastify";
+
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const AddEmployee = () => {
@@ -42,18 +44,18 @@ const AddEmployee = () => {
     try {
       if (existingEmployee) {
         await axios.put(
-          `${VITE_API_URL}/${existingEmployee.id}`,
+          `${VITE_API_URL}/employees/${existingEmployee.id}`,
           data,
         );
-        alert("✅ Employee Updated Successfully!");
+        toast.success("Employee Updated Successfully!");
       } else {
-        await axios.post(`${VITE_API_URL}/employees`, data);
-        alert("✅ Employee Added Successfully!");
+        await axios.post(`${VITE_API_URL}/employees/`, data);
+        toast.success("Employee Added Successfully!");
       }
       navigate("/view");
     } catch (error) {
       console.error(error);
-      alert("❌ Something went wrong!");
+      toast.error(" Something went wrong!");
     }
   };
 

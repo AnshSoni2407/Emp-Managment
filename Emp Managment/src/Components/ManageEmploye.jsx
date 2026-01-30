@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "./Header";
 import { FaFilter } from "react-icons/fa";
+import { MdDeleteForever } from "react-icons/md";
+import { FaEdit } from "react-icons/fa";
 import { TbArrowsSort } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 
@@ -45,18 +47,13 @@ const ManageEmployee = () => {
       const res = await axios.get(
         `${VITE_API_URL}/employees?page=${page}&limit=10`,
       );
-      const newData = res.data;
+      const newData = res.data.employees;
 
       if (newData.length < 9) {
         setHasMore(false);
       } else {
         // prevent duplicate data
         setEmployees((prev) => {
-          const ids = new Set(prev.map((e) => e.id));
-          const unique = newData.filter((e) => !ids.has(e.id));
-          return [...prev, ...unique];
-        });
-        setFilteredEmployees((prev) => {
           const ids = new Set(prev.map((e) => e.id));
           const unique = newData.filter((e) => !ids.has(e.id));
           return [...prev, ...unique];
@@ -70,31 +67,32 @@ const ManageEmployee = () => {
   };
 
   //  Filter Function
-  const handleFilter = () => {
-    let filtered = employees.filter((emp) => {
+  useEffect(() => {
+    const filtered = employees.filter((emp) => {
       const matchesName = emp.name
-        .toLowerCase()
+        ?.toLowerCase()
         .includes(filters.name.toLowerCase());
+
       const matchesSalary = filters.salary
-        ? emp.salary.toString().includes(filters.salary)
+        ? emp.salary?.toString().includes(filters.salary)
         : true;
+
       const matchesDept = filters.department
         ? emp.department
-            .toLowerCase()
+            ?.toLowerCase()
             .includes(filters.department.toLowerCase())
         : true;
+
       const matchesStatus = filters.status
-        ? emp.status.toLowerCase().includes(filters.status.toLowerCase())
+        ? emp.status?.trim().toLowerCase() ===
+          filters.status.trim().toLowerCase()
         : true;
 
       return matchesName && matchesSalary && matchesDept && matchesStatus;
     });
-    setFilteredEmployees(filtered);
-  };
 
-  useEffect(() => {
-    handleFilter();
-  }, [filters]);
+    setFilteredEmployees(filtered);
+  }, [filters, employees]);
 
   //  Sort by Name
   const handleSortByName = () => {
@@ -159,7 +157,7 @@ const ManageEmployee = () => {
             onClick={() => setIsFilterActive((prev) => !prev)}
             className="absolute right-0 top-0 bg-yellow-600 p-2 text-white   rounded-xl  text-lg flex gap-2 items-center cursor-pointer hover:bg-yellow-800 transition-all duration-300"
           >
-            <FaFilter />
+            <span className=" hidden md:block">Filters</span> <FaFilter />
           </button>
         </h2>
 
@@ -280,32 +278,48 @@ const ManageEmployee = () => {
               id="scrollableDiv"
               className="custom-scrollbar bg-white rounded-2xl  mt-4 h-[65vh] min-w-full mx-auto  overflow-auto  p-0"
             >
-              <table className=" w-full text-center border-collapse">
-                <thead className="sticky top-0 bg-gray-200 text-gray-700  uppercase text-sm">
+              <table className="w-full border-collapse text-sm md:text-base">
+                <thead className="sticky top-0 bg-gray-200 text-gray-700 uppercase">
                   <tr>
-                    <th className="py-3 px-4">Name</th>
-                    <th className="py-3 px-4">Email</th>
-                    <th className="py-3 px-4">Department</th>
-                    <th className="py-3 px-4">Designation</th>
-                    <th className="py-3 px-4">Salary</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4 text-center">Actions</th>
+                    <th className="px-2 py-2 md:px-4 md:py-3">Name</th>
+                    <th className="px-2 py-2 md:px-4 md:py-3">Email</th>
+                    <th className="px-2 py-2 md:px-4 md:py-3">Department</th>
+                    <th className="px-2 py-2 md:px-4 md:py-3">Designation</th>
+                    <th className="px-2 py-2 md:px-4 md:py-3">Salary</th>
+                    <th className="px-2 py-2 md:px-4 md:py-3">Status</th>
+                    <th className="px-2 py-2 md:px-4 md:py-3 text-center">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {filteredEmployees.map((emp) => (
                     <tr
                       key={emp.id}
                       className="border-t hover:bg-gray-50 transition-all"
                     >
-                      <td className="py-3 px-4 font-medium">{emp.name}</td>
-                      <td className="py-3 px-4">{emp.email}</td>
-                      <td className="py-3 px-4">{emp.department}</td>
-                      <td className="py-3 px-4">{emp.designation}</td>
-                      <td className="py-3 px-4">₹{emp.salary}</td>
-                      <td className="py-3 px-4">
+                      <td className="px-2 py-2 md:px-4 md:py-3 font-medium">
+                        {emp.name}
+                      </td>
+
+                      <td className="px-2 py-2 md:px-4 md:py-3">{emp.email}</td>
+
+                      <td className="px-2 py-2 md:px-4 md:py-3">
+                        {emp.department}
+                      </td>
+
+                      <td className="px-2 py-2 md:px-4 md:py-3">
+                        {emp.designation}
+                      </td>
+
+                      <td className="px-2 py-2 md:px-4 md:py-3">
+                        ₹{emp.salary}
+                      </td>
+
+                      <td className="px-2 py-2 md:px-4 md:py-3">
                         <span
-                          className={`px-3 py-1 rounded-full text-sm font-medium ${
+                          className={`px-2 py-0.5 md:px-3 md:py-1 rounded-full text-xs md:text-sm font-medium ${
                             emp.status === "Active"
                               ? "bg-green-100 text-green-700"
                               : "bg-red-100 text-red-700"
@@ -314,18 +328,20 @@ const ManageEmployee = () => {
                           {emp.status}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-center space-x-2">
+
+                      <td className="px-2 py-2 md:px-4 md:py-3 text-center">
                         <button
                           onClick={() => handleEdit(emp)}
-                          className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                          className="bg-blue-600 text-white p-1.5 rounded hover:bg-blue-700 transition cursor-pointer"
                         >
-                          Edit
+                          <FaEdit />
                         </button>
+
                         <button
                           onClick={() => openDeleteModal(emp.name, emp.id)}
-                          className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                          className="bg-red-600 text-white p-1.5 rounded hover:bg-red-700 transition cursor-pointer"
                         >
-                          Delete
+                          <MdDeleteForever />
                         </button>
                       </td>
                     </tr>

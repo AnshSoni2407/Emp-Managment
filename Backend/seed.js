@@ -1,15 +1,24 @@
 import mysql from "mysql2";
+import dotenv from "dotenv";
 import { faker } from "@faker-js/faker";
 
-const connection = mysql.createConnection({
-  host: "127.0.0.1",
-  user: "root",
-  password: "Respect+1",
+dotenv.config();
 
-  database: "employee_management",
+const connection = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS || "",
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
 });
 
-connection.connect();
+connection.connect((err) => {
+  if (err) {
+    console.log("❌ Seed DB connection failed:", err.message);
+    process.exit(1);
+  }
+  console.log("✅ Seed DB connected!");
+});
 
 for (let i = 0; i < 100; i++) {
   const name = faker.person.fullName();
@@ -20,7 +29,7 @@ for (let i = 0; i < 100; i++) {
     "IT",
     "Marketing",
   ]);
-  const status = faker.helpers.arrayElement(["Active", "Inactive"]);
+  const status = faker.helpers.arrayElement(["active", "inactive"]);
   const designation = faker.helpers.arrayElement([
     "Manager",
     "Developer",
@@ -29,8 +38,10 @@ for (let i = 0; i < 100; i++) {
   const salary = faker.number.int({ min: 30000, max: 80000 });
 
   connection.query(
-    "INSERT INTO employees (name, email, department, designation, salary, status) VALUES (?, ?, ?, ?, ?, ?)",
-    [name, email, department, designation, salary, status]
+    `INSERT INTO employees 
+     (name, email, department, designation, salary, status) 
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [name, email, department, designation, salary, status],
   );
 }
 
